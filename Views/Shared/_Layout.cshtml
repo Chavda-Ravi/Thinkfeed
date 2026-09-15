@@ -1,0 +1,89 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8" />
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
+
+    <title>@ViewData["Title"] - Thinkfeed</title>
+
+    <link rel="stylesheet"
+          href="~/css/site.css" />
+
+</head>
+
+<body>
+
+    <header>
+
+        <nav class="navbar">
+
+            <div class="navbar-left">
+
+                <a class="logo"
+                   asp-controller="Home"
+                   asp-action="Index">
+
+                    Thinkfeed
+
+                </a>
+
+            </div>
+
+
+            <div class="navbar-center">
+
+                <a asp-controller="Home"
+                   asp-action="Index">
+
+                    Feed
+
+                </a>
+
+                <a asp-controller="Account"
+                   asp-action="Login">
+
+                    Login
+
+                </a>
+
+                <a asp-controller="Account"
+                   asp-action="Register">
+
+                    Register
+
+                </a>
+
+            </div>
+
+        </nav>
+
+    </header>
+
+
+    <main class="main-content">
+
+        @RenderBody()
+
+    </main>
+
+
+    <footer class="footer">
+
+        <p>
+            © 2026 Thinkfeed. All rights reserved.
+        </p>
+
+    </footer>
+
+
+    <script src="~/js/site.js"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+
+</body>
+
+</html>

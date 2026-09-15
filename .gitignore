@@ -1,0 +1,39 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Build
+[Bb]in/
+[Oo]bj/
+
+# Visual Studio Code
+.vscode/
+
+# User-specific files
+*.rsuser
+
+# NuGet
+packages/
+
+# ASP.NET
+wwwroot/lib/
+
+# Logs
+*.log
+
+# Database files
+*.mdf
+*.ldf
+
+# Environment files
+.env
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Publish
+publish/
