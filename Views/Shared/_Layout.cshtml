@@ -5,13 +5,11 @@
 
     <meta charset="utf-8" />
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>@ViewData["Title"] - Thinkfeed</title>
 
-    <link rel="stylesheet"
-          href="~/css/site.css" />
+    <link rel="stylesheet" href="/css/site.css" />
 
 </head>
 
@@ -26,36 +24,56 @@
                 <a class="logo"
                    asp-controller="Home"
                    asp-action="Index">
-
                     Thinkfeed
-
                 </a>
 
             </div>
-
 
             <div class="navbar-center">
 
                 <a asp-controller="Home"
                    asp-action="Index">
-
                     Feed
-
                 </a>
 
-                <a asp-controller="Account"
-                   asp-action="Login">
-
-                    Login
-
+                <a asp-controller="BlogPosts"
+                   asp-action="Index">
+                    Blogs
                 </a>
 
-                <a asp-controller="Account"
-                   asp-action="Register">
+                @if (User.Identity != null && User.Identity.IsAuthenticated)
+                {
+                    <a asp-controller="Profile"
+                       asp-action="Index">
+                        Profile
+                    </a>
 
-                    Register
+                    <form asp-controller="Account"
+                          asp-action="Logout"
+                          method="post"
+                          class="logout-form">
 
-                </a>
+                        @Html.AntiForgeryToken()
+
+                        <button type="submit"
+                                class="nav-button">
+                            Logout
+                        </button>
+
+                    </form>
+                }
+                else
+                {
+                    <a asp-controller="Account"
+                       asp-action="Login">
+                        Login
+                    </a>
+
+                    <a asp-controller="Account"
+                       asp-action="Register">
+                        Register
+                    </a>
+                }
 
             </div>
 
@@ -80,7 +98,7 @@
     </footer>
 
 
-    <script src="~/js/site.js"></script>
+    <script src="/js/site.js"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
 

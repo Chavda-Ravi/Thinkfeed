@@ -1,0 +1,56 @@
+﻿@model Thinkfeed.Models.BlogPost
+
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<div class="blog-details-container">
+
+    <div class="blog-details-box">
+
+        @if (!string.IsNullOrEmpty(Model.ImagePath))
+        {
+            <img src="@Model.ImagePath"
+                 class="blog-details-image"
+                 alt="Blog Image" />
+        }
+
+        <div class="blog-details-content">
+
+            <h1>@Model.Title</h1>
+
+            <p class="blog-details-info">
+                By @(Model.User?.FullName ?? Model.User?.UserName)
+                |
+                @(Model.Category?.Name ?? "No Category")
+                |
+                @Model.CreatedAt.ToString("dd MMM yyyy")
+            </p>
+
+            <div class="blog-details-article">
+                @Model.Article
+            </div>
+
+            <div class="blog-actions">
+
+                <button type="button">
+                    Like
+                </button>
+
+                <button type="button">
+                    Comment
+                </button>
+
+            </div>
+
+            <a asp-controller="BlogPosts"
+               asp-action="Index"
+               class="back-button">
+                Back to Blogs
+            </a>
+
+        </div>
+
+    </div>
+
+</div>

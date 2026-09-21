@@ -1,0 +1,78 @@
+﻿@model Thinkfeed.ViewModels.ProfileViewModel
+
+@{
+    ViewData["Title"] = "Profile";
+}
+
+<div class="profile-container">
+
+    <div class="profile-card">
+
+        <div class="profile-image-container">
+
+            @if (!string.IsNullOrEmpty(Model.ProfileImage))
+            {
+                <img src="@Model.ProfileImage"
+                     class="profile-image"
+                     alt="Profile Image" />
+            }
+            else
+            {
+                <div class="profile-placeholder">
+                    @Model.FullName.Substring(0, 1).ToUpper()
+                </div>
+            }
+
+        </div>
+
+        <div class="profile-info">
+
+            <h1>@Model.FullName</h1>
+
+            <p class="profile-username">
+                @(Model.UserName ?? "")
+            </p>
+
+            @if (!string.IsNullOrEmpty(Model.Bio))
+            {
+                <p class="profile-bio">
+                    @Model.Bio
+                </p>
+            }
+            else
+            {
+                <p class="profile-bio">
+                    No bio added yet.
+                </p>
+            }
+
+            <a asp-controller="Profile"
+               asp-action="Edit"
+               class="profile-edit-button">
+                Edit Profile
+            </a>
+
+        </div>
+
+    </div>
+
+    <div class="profile-stats">
+
+        <div class="profile-stat">
+            <strong>0</strong>
+            <span>Blogs</span>
+        </div>
+
+        <div class="profile-stat">
+            <strong>0</strong>
+            <span>Followers</span>
+        </div>
+
+        <div class="profile-stat">
+            <strong>0</strong>
+            <span>Following</span>
+        </div>
+
+    </div>
+
+</div>

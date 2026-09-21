@@ -40,5 +40,4 @@ publish/
 
 # Configuration / secrets
 appsettings.json
-appsettings.*.json
-!appsettings.json.example
+
