@@ -1,13 +1,104 @@
-﻿@{
-    ViewData["Title"] = "Feed";
+﻿@model IEnumerable<Thinkfeed.Models.BlogPost>
+
+@{
+    ViewData["Title"] = "Thinkfeed";
 }
 
-<div class="welcome-section">
+<div class="blog-list-container">
 
-    <h1>Welcome to Thinkfeed</h1>
+    <div class="blog-list-header">
 
-    <p>
-        Share your knowledge, ideas and experiences with the community.
-    </p>
+        <h1>Thinkfeed</h1>
+
+        @if (User.Identity != null && User.Identity.IsAuthenticated)
+        {
+            <a asp-controller="BlogPosts"
+               asp-action="Create"
+               class="create-blog-button">
+                Create Blog
+            </a>
+        }
+
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="no-blogs">
+
+            <h3>No blogs yet</h3>
+
+            <p>
+                Be the first person to share something on Thinkfeed.
+            </p>
+
+            @if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                <br />
+
+                <a asp-controller="BlogPosts"
+                   asp-action="Create"
+                   class="create-blog-button">
+                    Create Your First Blog
+                </a>
+            }
+
+        </div>
+    }
+    else
+    {
+        @foreach (var blog in Model)
+        {
+            <div class="blog-card">
+
+                @if (!string.IsNullOrEmpty(blog.ImagePath))
+                {
+                    <img src="@blog.ImagePath"
+                         class="blog-image"
+                         alt="Blog Image" />
+                }
+
+                <div class="blog-content">
+
+                    <h2>@blog.Title</h2>
+
+                    <p class="blog-info">
+
+                        By
+
+                        @if (blog.User != null)
+                        {
+                            <a asp-controller="Profile"
+                               asp-action="ViewUser"
+                               asp-route-id="@blog.User.Id">
+                                @(blog.User.FullName ?? blog.User.UserName)
+                            </a>
+                        }
+
+                        |
+
+                        @(blog.Category?.Name ?? "No Category")
+
+                        |
+
+                        @blog.CreatedAt.ToString("dd MMM yyyy")
+
+                    </p>
+
+                    <p class="blog-article">
+                        @blog.Article
+                    </p>
+
+                    <a asp-controller="BlogPosts"
+                       asp-action="Details"
+                       asp-route-id="@blog.BlogPostId"
+                       class="read-button">
+                        Read More
+                    </a>
+
+                </div>
+
+            </div>
+        }
+    }
 
 </div>

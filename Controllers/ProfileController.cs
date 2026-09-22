@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Thinkfeed.Data;
 using Thinkfeed.Models;
 using Thinkfeed.ViewModels;
 
@@ -10,11 +12,14 @@ namespace Thinkfeed.Controllers
     public class ProfileController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ApplicationDbContext _context;
 
         public ProfileController(
-            UserManager<ApplicationUser> userManager)
+            UserManager<ApplicationUser> userManager,
+            ApplicationDbContext context)
         {
             _userManager = userManager;
+            _context = context;
         }
 
         [HttpGet]
@@ -34,6 +39,15 @@ namespace Thinkfeed.Controllers
                 Bio = user.Bio,
                 ProfileImage = user.ProfileImage
             };
+
+            ViewBag.BlogCount = await _context.BlogPosts
+                .CountAsync(b => b.UserId == user.Id);
+
+            ViewBag.FollowerCount = await _context.Follows
+                .CountAsync(f => f.FollowingId == user.Id);
+
+            ViewBag.FollowingCount = await _context.Follows
+                .CountAsync(f => f.FollowerId == user.Id);
 
             return View(model);
         }
@@ -107,6 +121,43 @@ namespace Thinkfeed.Controllers
             await _userManager.UpdateAsync(user);
 
             return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ViewUser(string id)
+        {
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Id == id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var currentUser = await _userManager.GetUserAsync(User);
+
+            bool isFollowing = false;
+
+            if (currentUser != null)
+            {
+                isFollowing = await _context.Follows
+                    .AnyAsync(f =>
+                        f.FollowerId == currentUser.Id &&
+                        f.FollowingId == user.Id);
+            }
+
+            ViewBag.IsFollowing = isFollowing;
+
+            ViewBag.BlogCount = await _context.BlogPosts
+                .CountAsync(b => b.UserId == user.Id);
+
+            ViewBag.FollowerCount = await _context.Follows
+                .CountAsync(f => f.FollowingId == user.Id);
+
+            ViewBag.FollowingCount = await _context.Follows
+                .CountAsync(f => f.FollowerId == user.Id);
+
+            return View(user);
         }
     }
 }

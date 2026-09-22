@@ -9,7 +9,7 @@
 
     <title>@ViewData["Title"] - Thinkfeed</title>
 
-    <link rel="stylesheet" href="/css/site.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 
 </head>
 
@@ -19,65 +19,56 @@
 
         <nav class="navbar">
 
-            <div class="navbar-left">
+    <div class="navbar-left">
 
-                <a class="logo"
-                   asp-controller="Home"
-                   asp-action="Index">
-                    Thinkfeed
-                </a>
+        <a class="logo"
+           asp-controller="Home"
+           asp-action="Index">
+            Thinkfeed
+        </a>
 
-            </div>
+    </div>
 
-            <div class="navbar-center">
+    <div class="navbar-center">
 
-                <a asp-controller="Home"
-                   asp-action="Index">
-                    Feed
-                </a>
+        @if (User.Identity != null &&
+             User.Identity.IsAuthenticated)
+        {
+            <a asp-controller="Profile"
+               asp-action="Index">
+                Profile
+            </a>
 
-                <a asp-controller="BlogPosts"
-                   asp-action="Index">
-                    Blogs
-                </a>
+            <form asp-controller="Account"
+                  asp-action="Logout"
+                  method="post"
+                  class="logout-form">
 
-                @if (User.Identity != null && User.Identity.IsAuthenticated)
-                {
-                    <a asp-controller="Profile"
-                       asp-action="Index">
-                        Profile
-                    </a>
+                @Html.AntiForgeryToken()
 
-                    <form asp-controller="Account"
-                          asp-action="Logout"
-                          method="post"
-                          class="logout-form">
+                <button type="submit"
+                        class="nav-button">
+                    Logout
+                </button>
 
-                        @Html.AntiForgeryToken()
+            </form>
+        }
+        else
+        {
+            <a asp-controller="Account"
+               asp-action="Login">
+                Login
+            </a>
 
-                        <button type="submit"
-                                class="nav-button">
-                            Logout
-                        </button>
+            <a asp-controller="Account"
+               asp-action="Register">
+                Register
+            </a>
+        }
 
-                    </form>
-                }
-                else
-                {
-                    <a asp-controller="Account"
-                       asp-action="Login">
-                        Login
-                    </a>
+    </div>
 
-                    <a asp-controller="Account"
-                       asp-action="Register">
-                        Register
-                    </a>
-                }
-
-            </div>
-
-        </nav>
+</nav>
 
     </header>
 
@@ -98,7 +89,7 @@
     </footer>
 
 
-    <script src="/js/site.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
 

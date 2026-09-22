@@ -1,7 +1,7 @@
-﻿@model Thinkfeed.ViewModels.ProfileViewModel
+﻿@model Thinkfeed.Models.ApplicationUser
 
 @{
-    ViewData["Title"] = "Profile";
+    ViewData["Title"] = Model.FullName ?? Model.UserName;
 }
 
 <div class="profile-container">
@@ -19,7 +19,7 @@
             else
             {
                 <div class="profile-placeholder">
-                    @Model.FullName.Substring(0, 1).ToUpper()
+                    @(Model.FullName ?? Model.UserName ?? "U").Substring(0, 1).ToUpper()
                 </div>
             }
 
@@ -27,7 +27,7 @@
 
         <div class="profile-info">
 
-            <h1>@Model.FullName</h1>
+            <h1>@(Model.FullName ?? "User")</h1>
 
             <p class="profile-username">
                 @(Model.UserName ?? "")
@@ -46,11 +46,37 @@
                 </p>
             }
 
-            <a asp-controller="Profile"
-               asp-action="Edit"
-               class="profile-edit-button">
-                Edit Profile
-            </a>
+            @if (User.Identity != null &&
+                 User.Identity.IsAuthenticated &&
+                 User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value != Model.Id)
+            {
+                <form asp-controller="Follow"
+                      asp-action="Toggle"
+                      method="post">
+
+                    @Html.AntiForgeryToken()
+
+                    <input type="hidden"
+                           name="userId"
+                           value="@Model.Id" />
+
+                    @if (ViewBag.IsFollowing)
+                    {
+                        <button type="submit"
+                                class="profile-edit-button">
+                            Unfollow
+                        </button>
+                    }
+                    else
+                    {
+                        <button type="submit"
+                                class="profile-edit-button">
+                            Follow
+                        </button>
+                    }
+
+                </form>
+            }
 
         </div>
 

@@ -20,7 +20,17 @@
             <h1>@Model.Title</h1>
 
             <p class="blog-details-info">
-                By @(Model.User?.FullName ?? Model.User?.UserName)
+                By
+
+                @if (Model.User != null)
+                {
+                    <a asp-controller="Profile"
+                       asp-action="ViewUser"
+                       asp-route-id="@Model.User.Id">
+                        @(Model.User.FullName ?? Model.User.UserName)
+                    </a>
+                }
+
                 |
                 @(Model.Category?.Name ?? "No Category")
                 |
@@ -33,15 +43,104 @@
 
             <div class="blog-actions">
 
-                <button type="button">
-                    Like
-                </button>
+                @if (User.Identity != null && User.Identity.IsAuthenticated)
+                {
+                    <form asp-controller="Likes"
+                          asp-action="Toggle"
+                          method="post">
 
-                <button type="button">
-                    Comment
-                </button>
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden"
+                               name="blogPostId"
+                               value="@Model.BlogPostId" />
+
+                        <button type="submit">
+                            Like (@Model.Likes.Count)
+                        </button>
+
+                    </form>
+                }
+                else
+                {
+                    <a asp-controller="Account"
+                       asp-action="Login"
+                       class="read-button">
+                        Login to Like
+                    </a>
+                }
 
             </div>
+
+            <hr />
+
+            <div class="comments-section">
+
+                <h2>Comments</h2>
+
+                @if (User.Identity != null && User.Identity.IsAuthenticated)
+                {
+                    <form asp-controller="Comments"
+                          asp-action="Add"
+                          method="post">
+
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden"
+                               name="blogPostId"
+                               value="@Model.BlogPostId" />
+
+                        <textarea name="content"
+                                  rows="4"
+                                  placeholder="Write your comment..."
+                                  required></textarea>
+
+                        <button type="submit">
+                            Add Comment
+                        </button>
+
+                    </form>
+                }
+                else
+                {
+                    <p>
+                        <a asp-controller="Account"
+                           asp-action="Login">
+                            Login
+                        </a>
+                        to write a comment.
+                    </p>
+                }
+
+                <div class="comment-list">
+
+                    @if (Model.Comments.Any())
+                    {
+                        @foreach (var comment in Model.Comments.OrderByDescending(c => c.CreatedAt))
+                        {
+                            <div class="comment-card">
+
+                                <p class="comment-content">
+                                    @comment.Content
+                                </p>
+
+                                <p class="comment-info">
+                                    @comment.CreatedAt.ToString("dd MMM yyyy hh:mm tt")
+                                </p>
+
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p>No comments yet.</p>
+                    }
+
+                </div>
+
+            </div>
+
+            <br />
 
             <a asp-controller="BlogPosts"
                asp-action="Index"
