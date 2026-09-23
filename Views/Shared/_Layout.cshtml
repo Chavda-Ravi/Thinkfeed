@@ -2,15 +2,14 @@
 <html lang="en">
 
 <head>
-
     <meta charset="utf-8" />
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>@ViewData["Title"] - Thinkfeed</title>
 
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-
+    <link rel="stylesheet"
+          href="~/css/site.css"
+          asp-append-version="true" />
 </head>
 
 <body>
@@ -19,56 +18,63 @@
 
         <nav class="navbar">
 
-    <div class="navbar-left">
+            <div class="navbar-left">
 
-        <a class="logo"
-           asp-controller="Home"
-           asp-action="Index">
-            Thinkfeed
-        </a>
+                <a class="logo"
+                   asp-controller="Home"
+                   asp-action="Index">
+                    Thinkfeed
+                </a>
 
-    </div>
+            </div>
 
-    <div class="navbar-center">
 
-        @if (User.Identity != null &&
-             User.Identity.IsAuthenticated)
-        {
-            <a asp-controller="Profile"
-               asp-action="Index">
-                Profile
-            </a>
+            <div class="navbar-center">
 
-            <form asp-controller="Account"
-                  asp-action="Logout"
-                  method="post"
-                  class="logout-form">
+                <a asp-controller="Search"
+                   asp-action="Index">
+                    Search
+                </a>
 
-                @Html.AntiForgeryToken()
 
-                <button type="submit"
-                        class="nav-button">
-                    Logout
-                </button>
+                @if (User.Identity != null &&
+                     User.Identity.IsAuthenticated)
+                {
+                    <a asp-controller="Profile"
+                       asp-action="Index">
+                        Profile
+                    </a>
 
-            </form>
-        }
-        else
-        {
-            <a asp-controller="Account"
-               asp-action="Login">
-                Login
-            </a>
+                    <form asp-controller="Account"
+                          asp-action="Logout"
+                          method="post"
+                          class="logout-form">
 
-            <a asp-controller="Account"
-               asp-action="Register">
-                Register
-            </a>
-        }
+                        @Html.AntiForgeryToken()
 
-    </div>
+                        <button type="submit"
+                                class="nav-button">
+                            Logout
+                        </button>
 
-</nav>
+                    </form>
+                }
+                else
+                {
+                    <a asp-controller="Account"
+                       asp-action="Login">
+                        Login
+                    </a>
+
+                    <a asp-controller="Account"
+                       asp-action="Register">
+                        Register
+                    </a>
+                }
+
+            </div>
+
+        </nav>
 
     </header>
 
@@ -89,9 +95,11 @@
     </footer>
 
 
-    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/site.js"></script>
 
-    @await RenderSectionAsync("Scripts", required: false)
+    @await RenderSectionAsync(
+        "Scripts",
+        required: false)
 
 </body>
 

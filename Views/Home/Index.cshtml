@@ -10,7 +10,8 @@
 
         <h1>Thinkfeed</h1>
 
-        @if (User.Identity != null && User.Identity.IsAuthenticated)
+        @if (User.Identity != null &&
+             User.Identity.IsAuthenticated)
         {
             <a asp-controller="BlogPosts"
                asp-action="Create"
@@ -20,6 +21,7 @@
         }
 
     </div>
+
 
     @if (!Model.Any())
     {
@@ -31,7 +33,8 @@
                 Be the first person to share something on Thinkfeed.
             </p>
 
-            @if (User.Identity != null && User.Identity.IsAuthenticated)
+            @if (User.Identity != null &&
+                 User.Identity.IsAuthenticated)
             {
                 <br />
 
@@ -57,9 +60,13 @@
                          alt="Blog Image" />
                 }
 
+
                 <div class="blog-content">
 
-                    <h2>@blog.Title</h2>
+                    <h2>
+                        @blog.Title
+                    </h2>
+
 
                     <p class="blog-info">
 
@@ -70,13 +77,17 @@
                             <a asp-controller="Profile"
                                asp-action="ViewUser"
                                asp-route-id="@blog.User.Id">
-                                @(blog.User.FullName ?? blog.User.UserName)
+
+                                @(blog.User.FullName
+                                    ?? blog.User.UserName)
+
                             </a>
                         }
 
                         |
 
-                        @(blog.Category?.Name ?? "No Category")
+                        @(blog.Category?.Name
+                            ?? "No Category")
 
                         |
 
@@ -84,9 +95,24 @@
 
                     </p>
 
+
                     <p class="blog-article">
                         @blog.Article
                     </p>
+
+
+                    <div class="blog-feed-stats">
+
+                        <span>
+                            ♥ @blog.Likes.Count
+                        </span>
+
+                        <span>
+                            💬 @blog.Comments.Count
+                        </span>
+
+                    </div>
+
 
                     <a asp-controller="BlogPosts"
                        asp-action="Details"

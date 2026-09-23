@@ -1,0 +1,186 @@
+﻿@model Thinkfeed.ViewModels.SearchViewModel
+
+@{
+    ViewData["Title"] = "Search";
+}
+
+<div class="search-page">
+
+    <div class="search-header">
+        <h1>Search Thinkfeed</h1>
+        <p>Find blogs, users and categories</p>
+    </div>
+
+    <div class="search-box">
+
+        <form asp-controller="Search"
+              asp-action="Index"
+              method="get">
+
+            <div class="search-row">
+
+                <div class="form-group">
+                    <label>Blog Search</label>
+
+                    <input type="text"
+                           name="query"
+                           value="@Model.Query"
+                           placeholder="Search title or article" />
+                </div>
+
+                <div class="form-group">
+                    <label>Username</label>
+
+                    <input type="text"
+                           name="username"
+                           value="@Model.Username"
+                           placeholder="Search username or name" />
+                </div>
+
+                <div class="form-group">
+                    <label>Category</label>
+
+                    <select name="categoryId">
+
+                        <option value="">
+                            All Categories
+                        </option>
+
+                        @foreach (var category in Model.Categories)
+                        {
+                            if (Model.CategoryId == category.CategoryId)
+                            {
+                                <option value="@category.CategoryId"
+                                        selected>
+                                    @category.Name
+                                </option>
+                            }
+                            else
+                            {
+                                <option value="@category.CategoryId">
+                                    @category.Name
+                                </option>
+                            }
+                        }
+
+                    </select>
+                </div>
+
+            </div>
+
+            <button type="submit"
+                    class="auth-button search-button">
+                Search
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <div class="search-results">
+
+        @if (!string.IsNullOrWhiteSpace(Model.Query)
+            || !string.IsNullOrWhiteSpace(Model.Username)
+            || Model.CategoryId.HasValue)
+        {
+            <h2>
+                Search Results
+            </h2>
+
+            <p class="search-result-count">
+                @Model.Results.Count blog(s) found
+            </p>
+        }
+
+        @if (!Model.Results.Any())
+        {
+            <div class="no-blogs">
+
+                @if (!string.IsNullOrWhiteSpace(Model.Query)
+                    || !string.IsNullOrWhiteSpace(Model.Username)
+                    || Model.CategoryId.HasValue)
+                {
+                    <h3>No blogs found</h3>
+
+                    <p>
+                        Try changing your search.
+                    </p>
+                }
+                else
+                {
+                    <h3>Start Searching</h3>
+
+                    <p>
+                        Search for blogs, users or categories.
+                    </p>
+                }
+
+            </div>
+        }
+        else
+        {
+            @foreach (var blog in Model.Results)
+            {
+                <div class="blog-card">
+
+                    @if (!string.IsNullOrEmpty(blog.ImagePath))
+                    {
+                        <img src="@blog.ImagePath"
+                             class="blog-image"
+                             alt="Blog Image" />
+                    }
+
+                    <div class="blog-content">
+
+                        <h2>
+                            @blog.Title
+                        </h2>
+
+                        <p class="blog-info">
+
+                            By
+
+                            @if (blog.User != null)
+                            {
+                                <a asp-controller="Profile"
+                                   asp-action="ViewUser"
+                                   asp-route-id="@blog.User.Id">
+
+                                    @(blog.User.FullName
+                                        ?? blog.User.UserName)
+
+                                </a>
+                            }
+
+                            |
+
+                            @(blog.Category?.Name
+                                ?? "No Category")
+
+                            |
+
+                            @blog.CreatedAt.ToString("dd MMM yyyy")
+
+                        </p>
+
+                        <p class="blog-article">
+                            @blog.Article
+                        </p>
+
+                        <a asp-controller="BlogPosts"
+                           asp-action="Details"
+                           asp-route-id="@blog.BlogPostId"
+                           class="read-button">
+                            Read More
+                        </a>
+
+                    </div>
+
+                </div>
+            }
+        }
+
+    </div>
+
+</div>

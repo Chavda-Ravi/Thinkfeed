@@ -20,6 +20,7 @@
             <h1>@Model.Title</h1>
 
             <p class="blog-details-info">
+
                 By
 
                 @if (Model.User != null)
@@ -32,18 +33,52 @@
                 }
 
                 |
+
                 @(Model.Category?.Name ?? "No Category")
+
                 |
+
                 @Model.CreatedAt.ToString("dd MMM yyyy")
+
             </p>
+
 
             <div class="blog-details-article">
                 @Model.Article
             </div>
 
+
+            @if (User.Identity != null &&
+                 User.Identity.IsAuthenticated &&
+                 Model.User != null &&
+                 User.FindFirst(
+                     System.Security.Claims.ClaimTypes.NameIdentifier
+                 )?.Value == Model.User.Id)
+            {
+                <div class="blog-owner-actions">
+
+                    <a asp-controller="BlogPosts"
+                       asp-action="Edit"
+                       asp-route-id="@Model.BlogPostId"
+                       class="profile-edit-button">
+                        Edit Blog
+                    </a>
+
+                    <a asp-controller="BlogPosts"
+                       asp-action="Delete"
+                       asp-route-id="@Model.BlogPostId"
+                       class="delete-button">
+                        Delete Blog
+                    </a>
+
+                </div>
+            }
+
+
             <div class="blog-actions">
 
-                @if (User.Identity != null && User.Identity.IsAuthenticated)
+                @if (User.Identity != null &&
+                     User.Identity.IsAuthenticated)
                 {
                     <form asp-controller="Likes"
                           asp-action="Toggle"
@@ -55,9 +90,18 @@
                                name="blogPostId"
                                value="@Model.BlogPostId" />
 
-                        <button type="submit">
-                            Like (@Model.Likes.Count)
-                        </button>
+                        @if (ViewBag.IsLiked == true)
+                        {
+                            <button type="submit">
+                                ♥ Unlike (@Model.Likes.Count)
+                            </button>
+                        }
+                        else
+                        {
+                            <button type="submit">
+                                ♡ Like (@Model.Likes.Count)
+                            </button>
+                        }
 
                     </form>
                 }
@@ -72,13 +116,16 @@
 
             </div>
 
+
             <hr />
+
 
             <div class="comments-section">
 
                 <h2>Comments</h2>
 
-                @if (User.Identity != null && User.Identity.IsAuthenticated)
+                @if (User.Identity != null &&
+                     User.Identity.IsAuthenticated)
                 {
                     <form asp-controller="Comments"
                           asp-action="Add"
@@ -104,48 +151,105 @@
                 else
                 {
                     <p>
+
                         <a asp-controller="Account"
                            asp-action="Login">
                             Login
                         </a>
+
                         to write a comment.
+
                     </p>
                 }
+
 
                 <div class="comment-list">
 
                     @if (Model.Comments.Any())
                     {
-                        @foreach (var comment in Model.Comments.OrderByDescending(c => c.CreatedAt))
+                        @foreach (var comment in Model.Comments
+                            .OrderByDescending(c => c.CreatedAt))
                         {
                             <div class="comment-card">
+
+                                <p class="comment-author">
+
+                                    @if (comment.User != null)
+                                    {
+                                        <a asp-controller="Profile"
+                                           asp-action="ViewUser"
+                                           asp-route-id="@comment.User.Id">
+
+                                            @(comment.User.FullName
+                                                ?? comment.User.UserName)
+
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span>User</span>
+                                    }
+
+                                </p>
+
 
                                 <p class="comment-content">
                                     @comment.Content
                                 </p>
 
+
                                 <p class="comment-info">
-                                    @comment.CreatedAt.ToString("dd MMM yyyy hh:mm tt")
+                                    @comment.CreatedAt.ToString(
+                                        "dd MMM yyyy hh:mm tt")
                                 </p>
+
+
+                                @if (User.Identity != null &&
+                                     User.Identity.IsAuthenticated &&
+                                     comment.User != null &&
+                                     User.FindFirst(
+                                         System.Security.Claims.ClaimTypes.NameIdentifier
+                                     )?.Value == comment.User.Id)
+                                {
+                                    <form asp-controller="Comments"
+                                          asp-action="Delete"
+                                          method="post">
+
+                                        @Html.AntiForgeryToken()
+
+                                        <input type="hidden"
+                                               name="id"
+                                               value="@comment.CommentId" />
+
+                                        <button type="submit"
+                                                class="delete-button">
+                                            Delete
+                                        </button>
+
+                                    </form>
+                                }
 
                             </div>
                         }
                     }
                     else
                     {
-                        <p>No comments yet.</p>
+                        <p>
+                            No comments yet.
+                        </p>
                     }
 
                 </div>
 
             </div>
 
+
             <br />
 
-            <a asp-controller="BlogPosts"
+            <a asp-controller="Home"
                asp-action="Index"
                class="back-button">
-                Back to Blogs
+                Back to Thinkfeed
             </a>
 
         </div>

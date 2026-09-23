@@ -19,7 +19,9 @@
             else
             {
                 <div class="profile-placeholder">
-                    @(Model.FullName ?? Model.UserName ?? "U").Substring(0, 1).ToUpper()
+                    @(Model.FullName ?? Model.UserName ?? "U")
+                    .Substring(0, 1)
+                    .ToUpper()
                 </div>
             }
 
@@ -48,7 +50,9 @@
 
             @if (User.Identity != null &&
                  User.Identity.IsAuthenticated &&
-                 User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value != Model.Id)
+                 User.FindFirst(
+                     System.Security.Claims.ClaimTypes.NameIdentifier
+                 )?.Value != Model.Id)
             {
                 <form asp-controller="Follow"
                       asp-action="Toggle"
@@ -82,6 +86,7 @@
 
     </div>
 
+
     <div class="profile-stats">
 
         <div class="profile-stat">
@@ -98,6 +103,72 @@
             <strong>@ViewBag.FollowingCount</strong>
             <span>Following</span>
         </div>
+
+    </div>
+
+
+    <div class="profile-blogs">
+
+        <h2>Blogs</h2>
+
+        @if (ViewBag.UserBlogs != null &&
+             ViewBag.UserBlogs.Count > 0)
+        {
+            @foreach (var blog in ViewBag.UserBlogs)
+            {
+                <div class="blog-card">
+
+                    @if (!string.IsNullOrEmpty(blog.ImagePath))
+                    {
+                        <img src="@blog.ImagePath"
+                             class="blog-image"
+                             alt="Blog Image" />
+                    }
+
+                    <div class="blog-content">
+
+                        <h2>
+                            @blog.Title
+                        </h2>
+
+                        <p class="blog-info">
+
+                            @(blog.Category?.Name ?? "No Category")
+
+                            |
+
+                            @blog.CreatedAt.ToString("dd MMM yyyy")
+
+                        </p>
+
+                        <p class="blog-article">
+                            @blog.Article
+                        </p>
+
+                        <a asp-controller="BlogPosts"
+                           asp-action="Details"
+                           asp-route-id="@blog.BlogPostId"
+                           class="read-button">
+                            Read More
+                        </a>
+
+                    </div>
+
+                </div>
+            }
+        }
+        else
+        {
+            <div class="no-blogs">
+
+                <h3>No blogs yet</h3>
+
+                <p>
+                    This user hasn't created any blogs yet.
+                </p>
+
+            </div>
+        }
 
     </div>
 

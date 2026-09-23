@@ -59,5 +59,41 @@ namespace Thinkfeed.Controllers
                 "BlogPosts",
                 new { id = blogPostId });
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user == null)
+            {
+                return Challenge();
+            }
+
+            var comment = await _context.Comments
+                .FirstOrDefaultAsync(c => c.CommentId == id);
+
+            if (comment == null)
+            {
+                return NotFound();
+            }
+
+            if (comment.UserId != user.Id)
+            {
+                return Forbid();
+            }
+
+            int blogPostId = comment.BlogPostId;
+
+            _context.Comments.Remove(comment);
+
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(
+                "Details",
+                "BlogPosts",
+                new { id = blogPostId });
+        }
     }
 }

@@ -19,7 +19,7 @@
             else
             {
                 <div class="profile-placeholder">
-                    @Model.FullName.Substring(0, 1).ToUpper()
+                    @(Model.FullName ?? "U").Substring(0, 1).ToUpper()
                 </div>
             }
 
@@ -56,6 +56,7 @@
 
     </div>
 
+
     <div class="profile-stats">
 
         <div class="profile-stat">
@@ -72,6 +73,80 @@
             <strong>@ViewBag.FollowingCount</strong>
             <span>Following</span>
         </div>
+
+    </div>
+
+
+    <div class="profile-blogs">
+
+        <h2>My Blogs</h2>
+
+        @if (ViewBag.UserBlogs != null &&
+             ViewBag.UserBlogs.Count > 0)
+        {
+            @foreach (var blog in ViewBag.UserBlogs)
+            {
+                <div class="blog-card">
+
+                    @if (!string.IsNullOrEmpty(blog.ImagePath))
+                    {
+                        <img src="@blog.ImagePath"
+                             class="blog-image"
+                             alt="Blog Image" />
+                    }
+
+                    <div class="blog-content">
+
+                        <h2>
+                            @blog.Title
+                        </h2>
+
+                        <p class="blog-info">
+
+                            @(blog.Category?.Name ?? "No Category")
+
+                            |
+
+                            @blog.CreatedAt.ToString("dd MMM yyyy")
+
+                        </p>
+
+                        <p class="blog-article">
+                            @blog.Article
+                        </p>
+
+                        <a asp-controller="BlogPosts"
+                           asp-action="Details"
+                           asp-route-id="@blog.BlogPostId"
+                           class="read-button">
+                            Read More
+                        </a>
+
+                    </div>
+
+                </div>
+            }
+        }
+        else
+        {
+            <div class="no-blogs">
+
+                <h3>No blogs yet</h3>
+
+                <p>
+                    You haven't created any blogs yet.
+                </p>
+
+                <br />
+
+                <a asp-controller="BlogPosts"
+                   asp-action="Create"
+                   class="create-blog-button">
+                    Create Your First Blog
+                </a>
+
+            </div>
+        }
 
     </div>
 

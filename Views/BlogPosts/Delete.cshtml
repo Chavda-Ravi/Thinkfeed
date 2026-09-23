@@ -1,0 +1,71 @@
+﻿@model Thinkfeed.Models.BlogPost
+
+@{
+    ViewData["Title"] = "Delete Blog";
+}
+
+<div class="blog-create-container">
+
+    <div class="blog-create-box">
+
+        <h2>Delete Blog</h2>
+
+        <p class="blog-subtitle">
+            Are you sure you want to delete this blog?
+        </p>
+
+        @if (!string.IsNullOrEmpty(Model.ImagePath))
+        {
+            <img src="@Model.ImagePath"
+                 class="blog-image"
+                 alt="Blog Image" />
+        }
+
+        <div class="blog-content">
+
+            <h2>
+                @Model.Title
+            </h2>
+
+            <p class="blog-info">
+                @(Model.Category?.Name ?? "No Category")
+                |
+                @Model.CreatedAt.ToString("dd MMM yyyy")
+            </p>
+
+            <p class="blog-article">
+                @Model.Article
+            </p>
+
+        </div>
+
+        <form asp-controller="BlogPosts"
+              asp-action="DeleteConfirmed"
+              method="post">
+
+            @Html.AntiForgeryToken()
+
+            <input type="hidden"
+                   name="id"
+                   value="@Model.BlogPostId" />
+
+            <button type="submit"
+                    class="auth-button">
+                Delete Blog
+            </button>
+
+        </form>
+
+        <p class="profile-back-link">
+
+            <a asp-controller="BlogPosts"
+               asp-action="Details"
+               asp-route-id="@Model.BlogPostId">
+                Cancel
+            </a>
+
+        </p>
+
+    </div>
+
+</div>

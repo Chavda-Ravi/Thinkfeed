@@ -49,6 +49,12 @@ namespace Thinkfeed.Controllers
             ViewBag.FollowingCount = await _context.Follows
                 .CountAsync(f => f.FollowerId == user.Id);
 
+            ViewBag.UserBlogs = await _context.BlogPosts
+                .Include(b => b.Category)
+                .Where(b => b.UserId == user.Id)
+                .OrderByDescending(b => b.CreatedAt)
+                .ToListAsync();
+
             return View(model);
         }
 
@@ -156,6 +162,12 @@ namespace Thinkfeed.Controllers
 
             ViewBag.FollowingCount = await _context.Follows
                 .CountAsync(f => f.FollowerId == user.Id);
+
+            ViewBag.UserBlogs = await _context.BlogPosts
+                .Include(b => b.Category)
+                .Where(b => b.UserId == user.Id)
+                .OrderByDescending(b => b.CreatedAt)
+                .ToListAsync();
 
             return View(user);
         }
