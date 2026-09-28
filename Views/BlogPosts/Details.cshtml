@@ -211,22 +211,48 @@
                                          System.Security.Claims.ClaimTypes.NameIdentifier
                                      )?.Value == comment.User.Id)
                                 {
-                                    <form asp-controller="Comments"
-                                          asp-action="Delete"
-                                          method="post">
+                                    <div class="comment-actions">
 
-                                        @Html.AntiForgeryToken()
+                                        <form asp-controller="Comments"
+                                              asp-action="Edit"
+                                              method="post">
 
-                                        <input type="hidden"
-                                               name="id"
-                                               value="@comment.CommentId" />
+                                            @Html.AntiForgeryToken()
 
-                                        <button type="submit"
-                                                class="delete-button">
-                                            Delete
-                                        </button>
+                                            <input type="hidden"
+                                                   name="id"
+                                                   value="@comment.CommentId" />
 
-                                    </form>
+                                            <input type="text"
+                                                   name="content"
+                                                   value="@comment.Content"
+                                                   required />
+
+                                            <button type="submit">
+                                                Edit
+                                            </button>
+
+                                        </form>
+
+
+                                        <form asp-controller="Comments"
+                                              asp-action="Delete"
+                                              method="post">
+
+                                            @Html.AntiForgeryToken()
+
+                                            <input type="hidden"
+                                                   name="id"
+                                                   value="@comment.CommentId" />
+
+                                            <button type="submit"
+                                                    class="delete-button">
+                                                Delete
+                                            </button>
+
+                                        </form>
+
+                                    </div>
                                 }
 
                             </div>

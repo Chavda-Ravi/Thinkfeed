@@ -1,58 +1,23 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Thinkfeed.Data;
+using Microsoft.AspNetCore.Mvc;
+using Thinkfeed.Services.Interfaces;
 using Thinkfeed.ViewModels;
 
 namespace Thinkfeed.Controllers
 {
     public class SearchController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ISearchService _searchService;
 
-        public SearchController(ApplicationDbContext context)
+        public SearchController(ISearchService searchService)
         {
-            _context = context;
+            _searchService = searchService;
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(
-            string? query,
-            int? categoryId,
-            string? username)
+        public async Task<IActionResult> Index(string? query, int? categoryId, string? username)
         {
-            var categories = await _context.Categories
-                .OrderBy(c => c.Name)
-                .ToListAsync();
-
-            var blogs = _context.BlogPosts
-                .Include(b => b.User)
-                .Include(b => b.Category)
-                .AsQueryable();
-
-            if (!string.IsNullOrWhiteSpace(query))
-            {
-                blogs = blogs.Where(b =>
-                    b.Title.Contains(query) ||
-                    b.Article.Contains(query));
-            }
-
-            if (categoryId.HasValue)
-            {
-                blogs = blogs.Where(b =>
-                    b.CategoryId == categoryId.Value);
-            }
-
-            if (!string.IsNullOrWhiteSpace(username))
-            {
-                blogs = blogs.Where(b =>
-                    b.User != null &&
-                    (b.User.UserName!.Contains(username) ||
-                     b.User.FullName!.Contains(username)));
-            }
-
-            var results = await blogs
-                .OrderByDescending(b => b.CreatedAt)
-                .ToListAsync();
+            var categories = await _searchService.GetCategoriesAsync();
+            var results = await _searchService.SearchAsync(query, categoryId, username);
 
             var model = new SearchViewModel
             {

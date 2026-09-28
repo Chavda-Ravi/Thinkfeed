@@ -2,6 +2,14 @@
 
 @{
     ViewData["Title"] = "Profile";
+
+    string displayName = !string.IsNullOrWhiteSpace(Model.FullName)
+        ? Model.FullName
+        : Model.UserName ?? "User";
+
+    string profileInitial = !string.IsNullOrWhiteSpace(displayName)
+        ? displayName.Substring(0, 1).ToUpper()
+        : "U";
 }
 
 <div class="profile-container">
@@ -19,7 +27,7 @@
             else
             {
                 <div class="profile-placeholder">
-                    @(Model.FullName ?? "U").Substring(0, 1).ToUpper()
+                    @profileInitial
                 </div>
             }
 
@@ -56,7 +64,6 @@
 
     </div>
 
-
     <div class="profile-stats">
 
         <div class="profile-stat">
@@ -75,7 +82,6 @@
         </div>
 
     </div>
-
 
     <div class="profile-blogs">
 
@@ -97,18 +103,12 @@
 
                     <div class="blog-content">
 
-                        <h2>
-                            @blog.Title
-                        </h2>
+                        <h2>@blog.Title</h2>
 
                         <p class="blog-info">
-
                             @(blog.Category?.Name ?? "No Category")
-
                             |
-
                             @blog.CreatedAt.ToString("dd MMM yyyy")
-
                         </p>
 
                         <p class="blog-article">
@@ -130,7 +130,6 @@
         else
         {
             <div class="no-blogs">
-
                 <h3>No blogs yet</h3>
 
                 <p>
@@ -144,7 +143,6 @@
                    class="create-blog-button">
                     Create Your First Blog
                 </a>
-
             </div>
         }
 

@@ -1,23 +1,22 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Thinkfeed.Data;
 using Thinkfeed.Models;
+using Thinkfeed.Services.Interfaces;
 
 namespace Thinkfeed.Controllers
 {
     [Authorize]
     public class FollowController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IFollowService _followService;
         private readonly UserManager<ApplicationUser> _userManager;
 
         public FollowController(
-            ApplicationDbContext context,
+            IFollowService followService,
             UserManager<ApplicationUser> userManager)
         {
-            _context = context;
+            _followService = followService;
             _userManager = userManager;
         }
 
@@ -26,44 +25,13 @@ namespace Thinkfeed.Controllers
         public async Task<IActionResult> Toggle(string userId)
         {
             var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null) return Challenge();
 
-            if (currentUser == null)
-            {
-                return Challenge();
-            }
+            if (currentUser.Id == userId) return RedirectToAction("Index", "Profile");
 
-            if (currentUser.Id == userId)
-            {
-                return RedirectToAction("Index", "Profile");
-            }
+            await _followService.ToggleAsync(currentUser.Id, userId);
 
-            var existingFollow = await _context.Follows
-                .FirstOrDefaultAsync(f =>
-                    f.FollowerId == currentUser.Id &&
-                    f.FollowingId == userId);
-
-            if (existingFollow != null)
-            {
-                _context.Follows.Remove(existingFollow);
-            }
-            else
-            {
-                var follow = new Follow
-                {
-                    FollowerId = currentUser.Id,
-                    FollowingId = userId,
-                    CreatedAt = DateTime.Now
-                };
-
-                _context.Follows.Add(follow);
-            }
-
-            await _context.SaveChangesAsync();
-
-            return RedirectToAction(
-                "ViewUser",
-                "Profile",
-                new { id = userId });
+            return RedirectToAction("ViewUser", "Profile", new { id = userId });
         }
     }
 }

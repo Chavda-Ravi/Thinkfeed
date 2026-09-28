@@ -1,26 +1,22 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Thinkfeed.Data;
+using Thinkfeed.Models;
+using Thinkfeed.Services.Interfaces;
 using System.Diagnostics;
 
 namespace Thinkfeed.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IBlogService _blogService;
 
-        public HomeController(ApplicationDbContext context)
+        public HomeController(IBlogService blogService)
         {
-            _context = context;
+            _blogService = blogService;
         }
 
         public async Task<IActionResult> Index()
         {
-            var blogs = await _context.BlogPosts
-                .Include(b => b.User)
-                .Include(b => b.Category)
-                .OrderByDescending(b => b.CreatedAt)
-                .ToListAsync();
+            var blogs = await _blogService.GetAllAsync();
 
             return View(blogs);
         }

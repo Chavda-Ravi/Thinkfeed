@@ -1,9 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Thinkfeed.Data;
 using Thinkfeed.Models;
+using Thinkfeed.Services.Interfaces;
 using Thinkfeed.ViewModels;
 
 namespace Thinkfeed.Controllers
@@ -11,35 +10,27 @@ namespace Thinkfeed.Controllers
     [Authorize]
     public class BlogPostsController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IBlogService _blogService;
         private readonly UserManager<ApplicationUser> _userManager;
 
         public BlogPostsController(
-            ApplicationDbContext context,
+            IBlogService blogService,
             UserManager<ApplicationUser> userManager)
         {
-            _context = context;
+            _blogService = blogService;
             _userManager = userManager;
         }
 
         public async Task<IActionResult> Index()
         {
-            var blogs = await _context.BlogPosts
-                .Include(b => b.User)
-                .Include(b => b.Category)
-                .OrderByDescending(b => b.CreatedAt)
-                .ToListAsync();
-
+            var blogs = await _blogService.GetAllAsync();
             return View(blogs);
         }
 
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            ViewBag.Categories = await _context.Categories
-                .OrderBy(c => c.Name)
-                .ToListAsync();
-
+            ViewBag.Categories = await _blogService.GetCategoriesAsync();
             return View();
         }
 
@@ -49,103 +40,25 @@ namespace Thinkfeed.Controllers
         {
             if (!ModelState.IsValid)
             {
-                ViewBag.Categories = await _context.Categories
-                    .OrderBy(c => c.Name)
-                    .ToListAsync();
-
+                ViewBag.Categories = await _blogService.GetCategoriesAsync();
                 return View(model);
             }
 
             var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Challenge();
 
-            if (user == null)
-            {
-                return Challenge();
-            }
+            await _blogService.CreateAsync(model, user);
 
-            string? imagePath = null;
-
-            if (model.Image != null)
-            {
-                string uploadsFolder = Path.Combine(
-                    Directory.GetCurrentDirectory(),
-                    "wwwroot",
-                    "Images");
-
-                Directory.CreateDirectory(uploadsFolder);
-
-                string fileName = Guid.NewGuid().ToString()
-                    + Path.GetExtension(model.Image.FileName);
-
-                string filePath = Path.Combine(
-                    uploadsFolder,
-                    fileName);
-
-                using (var stream = new FileStream(
-                    filePath,
-                    FileMode.Create))
-                {
-                    await model.Image.CopyToAsync(stream);
-                }
-
-                imagePath = "/Images/" + fileName;
-            }
-
-            var blogPost = new BlogPost
-            {
-                Title = model.Title,
-                Article = model.Article,
-                CategoryId = model.CategoryId,
-                ImagePath = imagePath,
-                UserId = user.Id,
-                CreatedAt = DateTime.Now
-            };
-
-            _context.BlogPosts.Add(blogPost);
-
-            await _context.SaveChangesAsync();
-
-            return RedirectToAction(
-                "Index",
-                "Home");
+            return RedirectToAction("Index", "Home");
         }
 
         [AllowAnonymous]
         public async Task<IActionResult> Details(int id)
         {
-            var blog = await _context.BlogPosts
-                .Include(b => b.User)
-                .Include(b => b.Category)
-                .Include(b => b.Comments)
-                    .ThenInclude(c => c.User)
-                .Include(b => b.Likes)
-                .FirstOrDefaultAsync(
-                    b => b.BlogPostId == id);
-
-            if (blog == null)
-            {
-                return NotFound();
-            }
-
-            bool isLiked = false;
-
-            if (User.Identity != null &&
-                User.Identity.IsAuthenticated)
-            {
-                var currentUser = await _userManager
-                    .GetUserAsync(User);
-
-                if (currentUser != null)
-                {
-                    isLiked = await _context.Likes
-                        .AnyAsync(l =>
-                            l.BlogPostId == id &&
-                            l.UserId == currentUser.Id);
-                }
-            }
-
+            var currentUser = User.Identity != null && User.Identity.IsAuthenticated ? await _userManager.GetUserAsync(User) : null;
+            var (blog, isLiked) = await _blogService.GetDetailsAsync(id, currentUser?.Id);
+            if (blog == null) return NotFound();
             ViewBag.IsLiked = isLiked;
-
             return View(blog);
         }
 
@@ -153,173 +66,52 @@ namespace Thinkfeed.Controllers
         public async Task<IActionResult> Edit(int id)
         {
             var user = await _userManager.GetUserAsync(User);
-
-            if (user == null)
-            {
-                return Challenge();
-            }
-
-            var blog = await _context.BlogPosts
-                .FirstOrDefaultAsync(
-                    b => b.BlogPostId == id);
-
-            if (blog == null)
-            {
-                return NotFound();
-            }
-
-            if (blog.UserId != user.Id)
-            {
-                return Forbid();
-            }
-
-            ViewBag.Categories = await _context.Categories
-                .OrderBy(c => c.Name)
-                .ToListAsync();
-
-            var model = new BlogPostViewModel
-            {
-                Title = blog.Title,
-                Article = blog.Article,
-                CategoryId = blog.CategoryId
-            };
-
+            if (user == null) return Challenge();
+            var blog = await _blogService.GetByIdAsync(id);
+            if (blog == null) return NotFound();
+            if (blog.UserId != user.Id) return Forbid();
+            ViewBag.Categories = await _blogService.GetCategoriesAsync();
+            var model = new BlogPostViewModel { Title = blog.Title, Article = blog.Article, CategoryId = blog.CategoryId };
             return View(model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(
-            int id,
-            BlogPostViewModel model)
+        public async Task<IActionResult> Edit(int id, BlogPostViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                ViewBag.Categories = await _context.Categories
-                    .OrderBy(c => c.Name)
-                    .ToListAsync();
-
+                ViewBag.Categories = await _blogService.GetCategoriesAsync();
                 return View(model);
             }
 
             var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Challenge();
 
-            if (user == null)
-            {
-                return Challenge();
-            }
+            await _blogService.EditAsync(id, model, user.Id);
 
-            var blog = await _context.BlogPosts
-                .FirstOrDefaultAsync(
-                    b => b.BlogPostId == id);
-
-            if (blog == null)
-            {
-                return NotFound();
-            }
-
-            if (blog.UserId != user.Id)
-            {
-                return Forbid();
-            }
-
-            blog.Title = model.Title;
-            blog.Article = model.Article;
-            blog.CategoryId = model.CategoryId;
-
-            if (model.Image != null)
-            {
-                string uploadsFolder = Path.Combine(
-                    Directory.GetCurrentDirectory(),
-                    "wwwroot",
-                    "Images");
-
-                Directory.CreateDirectory(uploadsFolder);
-
-                string fileName = Guid.NewGuid().ToString()
-                    + Path.GetExtension(model.Image.FileName);
-
-                string filePath = Path.Combine(
-                    uploadsFolder,
-                    fileName);
-
-                using (var stream = new FileStream(
-                    filePath,
-                    FileMode.Create))
-                {
-                    await model.Image.CopyToAsync(stream);
-                }
-
-                blog.ImagePath = "/Images/" + fileName;
-            }
-
-            await _context.SaveChangesAsync();
-
-            return RedirectToAction(
-                "Details",
-                new { id = blog.BlogPostId });
+            return RedirectToAction("Details", new { id = id });
         }
 
         [HttpGet]
         public async Task<IActionResult> Delete(int id)
         {
             var user = await _userManager.GetUserAsync(User);
-
-            if (user == null)
-            {
-                return Challenge();
-            }
-
-            var blog = await _context.BlogPosts
-                .FirstOrDefaultAsync(
-                    b => b.BlogPostId == id);
-
-            if (blog == null)
-            {
-                return NotFound();
-            }
-
-            if (blog.UserId != user.Id)
-            {
-                return Forbid();
-            }
-
+            if (user == null) return Challenge();
+            var blog = await _blogService.GetByIdAsync(id);
+            if (blog == null) return NotFound();
+            if (blog.UserId != user.Id) return Forbid();
             return View(blog);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(
-            int id)
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var user = await _userManager.GetUserAsync(User);
-
-            if (user == null)
-            {
-                return Challenge();
-            }
-
-            var blog = await _context.BlogPosts
-                .FirstOrDefaultAsync(
-                    b => b.BlogPostId == id);
-
-            if (blog == null)
-            {
-                return NotFound();
-            }
-
-            if (blog.UserId != user.Id)
-            {
-                return Forbid();
-            }
-
-            _context.BlogPosts.Remove(blog);
-
-            await _context.SaveChangesAsync();
-
-            return RedirectToAction(
-                "Index",
-                "Home");
+            if (user == null) return Challenge();
+            await _blogService.DeleteAsync(id, user.Id);
+            return RedirectToAction("Index", "Home");
         }
     }
 }
