@@ -34,12 +34,28 @@
         {
             <div class="blog-card">
 
-                @if (!string.IsNullOrEmpty(blog.ImagePath))
-                {
-                    <img src="@blog.ImagePath"
-                         class="blog-image"
-                         alt="Blog Image" />
-                }
+                @* Carousel for images *@
+                <div class="blog-image-carousel" data-carousel-id="@blog.BlogPostId">
+                    <button class="carousel-button carousel-prev" aria-label="Previous image" type="button">&lt;</button>
+                    <div class="blog-image-track">
+                        @if (blog.Images != null && blog.Images.Any())
+                        {
+                            @foreach (var img in blog.Images)
+                            {
+                                <div class="carousel-slide">
+                                    <img src="@img.ImagePath" class="blog-image" alt="Blog Image" />
+                                </div>
+                            }
+                        }
+                        else if (!string.IsNullOrEmpty(blog.ImagePath))
+                        {
+                            <div class="carousel-slide">
+                                <img src="@blog.ImagePath" class="blog-image" alt="Blog Image" />
+                            </div>
+                        }
+                    </div>
+                    <button class="carousel-button carousel-next" aria-label="Next image" type="button">&gt;</button>
+                </div>
 
                 <div class="blog-content">
 

@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
+using System.ComponentModel.DataAnnotations;
 
 namespace Thinkfeed.ViewModels
 {
@@ -12,9 +12,9 @@ namespace Thinkfeed.ViewModels
         [Required]
         public string Article { get; set; } = string.Empty;
 
+        public List<IFormFile> Images { get; set; } = new List<IFormFile>();
+
         [Required]
         public int CategoryId { get; set; }
-
-        public IFormFile? Image { get; set; }
     }
 }

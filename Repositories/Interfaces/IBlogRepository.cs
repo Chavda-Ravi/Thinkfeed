@@ -9,6 +9,7 @@ namespace Thinkfeed.Repositories.Interfaces
         Task<BlogPost?> GetByIdAsync(int id);
 
         Task<List<BlogPost>> GetByUserIdAsync(string userId);
+        Task<List<Category>> GetCategoriesAsync();
 
         Task AddAsync(BlogPost blogPost);
 

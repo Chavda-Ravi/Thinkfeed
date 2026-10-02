@@ -1,4 +1,6 @@
-﻿@{
+﻿@model Thinkfeed.ViewModels.BlogPostViewModel
+
+@{
     ViewData["Title"] = "Create Blog";
 }
 
@@ -6,72 +8,81 @@
 
     <div class="blog-create-box">
 
-        <h2>Create Blog</h2>
+        <h2 class="create-blog-title">Create Blog</h2>
 
-        <p class="blog-subtitle">
-            Share your thoughts with Thinkfeed
-        </p>
-
-        <form asp-controller="BlogPosts"
-              asp-action="Create"
+        <form asp-action="Create"
               method="post"
-              enctype="multipart/form-data">
+              enctype="multipart/form-data" class="create-blog-form">
 
             @Html.AntiForgeryToken()
 
-            <div asp-validation-summary="All" class="validation"></div>
+            <div asp-validation-summary="ModelOnly" class="validation"></div>
 
-            <div class="form-group">
+            <div class="form-group create-blog-field">
                 <label>Title</label>
-
-                <input type="text"
-                       name="Title"
-                       placeholder="Enter blog title"
-                       required />
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="validation"></span>
             </div>
 
-            <div class="form-group">
+            <div class="form-group create-blog-field">
                 <label>Article</label>
-
-                <textarea name="Article"
-                          placeholder="Write your article..."
-                          rows="10"
-                          required></textarea>
+                <textarea asp-for="Article" class="form-control" rows="8"></textarea>
+                <span asp-validation-for="Article" class="validation"></span>
             </div>
 
-            <div class="form-group">
+            <div class="form-group create-blog-field">
                 <label>Category</label>
-
-                <select name="CategoryId" required>
-
-                    <option value="">
-                        Select Category
-                    </option>
-
+                <select asp-for="CategoryId" class="form-control">
+                    <option value="">-- Select Category --</option>
                     @foreach (var category in ViewBag.Categories)
                     {
-                        <option value="@category.CategoryId">
-                            @category.Name
-                        </option>
+                        <option value="@category.CategoryId">@category.Name</option>
                     }
-
                 </select>
+                <span asp-validation-for="CategoryId" class="validation"></span>
             </div>
 
-            <div class="form-group">
-                <label>Blog Image</label>
-
-                <input type="file"
-                       name="Image"
-                       accept="image/*" />
+            <div class="form-group create-blog-image-upload">
+                <label>Blog Images</label>
+                <input asp-for="Images" type="file" class="form-control" multiple accept="image/*" />
+                <small class="text-muted">You can select multiple images (up to 10). Preview appears below.</small>
+                <div id="create-image-preview" style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;"></div>
             </div>
 
-            <button type="submit" class="auth-button">
-                Publish Blog
-            </button>
+            <div class="create-blog-actions" style="display:flex; gap:10px; align-items:center; margin-top:16px;">
+                <button type="submit" class="auth-button">Publish Blog</button>
+                <a asp-controller="Home" asp-action="Index" class="auth-link">Cancel</a>
+            </div>
 
         </form>
 
     </div>
 
 </div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+    <script>
+        // Preview selected images locally before upload
+        (function(){
+            var input = document.querySelector('input[name="Images"]');
+            var preview = document.getElementById('create-image-preview');
+            if (!input || !preview) return;
+            input.addEventListener('change', function(e){
+                preview.innerHTML = '';
+                var files = Array.from(this.files).slice(0,10);
+                files.forEach(function(file){
+                    if (!file.type.startsWith('image/')) return;
+                    var reader = new FileReader();
+                    reader.onload = function(ev){
+                        var img = document.createElement('img');
+                        img.src = ev.target.result;
+                        img.style.width = '80px'; img.style.height = '80px'; img.style.objectFit = 'cover'; img.style.borderRadius = '6px';
+                        preview.appendChild(img);
+                    };
+                    reader.readAsDataURL(file);
+                });
+            });
+        })();
+    </script>
+}

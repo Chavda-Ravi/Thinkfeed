@@ -6,19 +6,17 @@ namespace Thinkfeed.Data
 {
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        public ApplicationDbContext(
+            DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
         }
 
         public DbSet<BlogPost> BlogPosts { get; set; }
-
+        public DbSet<BlogPostImage> BlogPostImages { get; set; }
         public DbSet<Comment> Comments { get; set; }
-
         public DbSet<Like> Likes { get; set; }
-
         public DbSet<Follow> Follows { get; set; }
-
         public DbSet<Category> Categories { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -36,6 +34,12 @@ namespace Thinkfeed.Data
                 .WithMany(c => c.BlogPosts)
                 .HasForeignKey(b => b.CategoryId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<BlogPostImage>()
+                .HasOne(i => i.BlogPost)
+                .WithMany(b => b.Images)
+                .HasForeignKey(i => i.BlogPostId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<Comment>()
                 .HasOne(c => c.BlogPost)

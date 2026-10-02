@@ -90,13 +90,41 @@
 
             <div class="form-group">
 
-                <label>New Blog Image</label>
+                <label>Existing Images</label>
 
-                <input type="file"
-                       name="Image"
+                <div style="margin-bottom:10px;">
+                    @if (ViewBag.ExistingImages != null && ((List<string>)ViewBag.ExistingImages).Any())
+                    {
+                        <div class="blog-image-carousel" data-carousel-id="edit-@(Context.Request.RouteValues["id"])">
+                            <button class="carousel-button carousel-prev" aria-label="Previous image" type="button">&lt;</button>
+                            <div class="blog-image-track">
+                                @foreach (var img in (List<string>)ViewBag.ExistingImages)
+                                {
+                                    <div class="carousel-slide">
+                                        <img src="@img" class="blog-image" alt="Blog Image" />
+                                    </div>
+                                }
+                            </div>
+                            <button class="carousel-button carousel-next" aria-label="Next image" type="button">&gt;</button>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted">No images</p>
+                    }
+                </div>
+
+                <label>Add More Images (optional)</label>
+
+                <input asp-for="Images"
+                       type="file"
+                       class="form-control"
+                       multiple
                        accept="image/*" />
 
-            </div>
+                <small class="text-muted">
+                    Selected images will be added to the existing images (additive). You can upload up to 10 images, each max 5 MB.                </small>
+            </div>
 
 
             <button type="submit"

@@ -21,6 +21,7 @@ namespace Thinkfeed.Repositories
                 .Include(b => b.Category)
                 .Include(b => b.Likes)
                 .Include(b => b.Comments)
+                .Include(b => b.Images)
                 .OrderByDescending(b => b.CreatedAt)
                 .ToListAsync();
         }
@@ -33,15 +34,26 @@ namespace Thinkfeed.Repositories
                 .Include(b => b.Likes)
                 .Include(b => b.Comments)
                     .ThenInclude(c => c.User)
-                .FirstOrDefaultAsync(b => b.BlogPostId == id);
+                .Include(b => b.Images)
+                .FirstOrDefaultAsync(
+                    b => b.BlogPostId == id);
         }
 
-        public async Task<List<BlogPost>> GetByUserIdAsync(string userId)
+        public async Task<List<BlogPost>> GetByUserIdAsync(
+            string userId)
         {
             return await _context.BlogPosts
                 .Include(b => b.Category)
+                .Include(b => b.Images)
                 .Where(b => b.UserId == userId)
                 .OrderByDescending(b => b.CreatedAt)
+                .ToListAsync();
+        }
+
+        public async Task<List<Category>> GetCategoriesAsync()
+        {
+            return await _context.Categories
+                .OrderBy(c => c.Name)
                 .ToListAsync();
         }
 
