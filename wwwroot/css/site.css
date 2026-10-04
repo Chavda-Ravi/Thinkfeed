@@ -539,32 +539,28 @@ body {
 
 /* Create/Edit form specific tweaks */
 .create-blog-container, .blog-create-container {
-    display: flex;
-    justify-content: center;
+    max-width: 900px;
+    margin: 0 auto;
     padding: 30px 15px;
 }
 
 .create-blog-box, .blog-create-box {
     width: 100%;
-    max-width: 900px;
-    background: #0b1220;
-    padding: 24px;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    background: white;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
 }
 
 .create-blog-title {
     margin-bottom: 8px;
-    font-size: 20px;
+    font-size: 32px;
+    color: #111827;
 }
 
-.create-blog-field {
-    width: 100%;
-    padding: 10px;
-    border-radius: 6px;
-    border: 1px solid rgba(255,255,255,0.08);
-    background: rgba(255,255,255,0.02);
-    color: #e6eef8;
+.blog-subtitle {
+    color: #777;
+    margin-bottom: 25px;
 }
 
 .create-blog-image-upload {
@@ -572,10 +568,75 @@ body {
     margin-top: 6px;
 }
 
-.create-blog-actions {
+.blog-form-actions {
     display: flex;
     gap: 12px;
-    margin-top: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 15px;
+    font-family: Arial, sans-serif;
+    background: white;
+    color: #111827;
+}
+
+    .form-control:focus {
+        border-color: #2563eb;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+textarea.form-control,
+select.form-control {
+    min-height: 120px;
+}
+
+select.form-control {
+    appearance: menulist;
+}
+
+.text-muted {
+    color: #6b7280;
+    font-size: 13px;
+}
+
+.secondary-button {
+    display: inline-block;
+    padding: 10px 18px;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    background: #f8fafc;
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+    .secondary-button:hover {
+        background: #eef2ff;
+    }
+
+@media (max-width: 576px) {
+    .create-blog-box, .blog-create-box {
+        padding: 24px 18px;
+    }
+
+    .blog-form-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .blog-form-actions .auth-button,
+    .blog-form-actions .secondary-button {
+        width: 100%;
+        text-align: center;
+    }
 }
 
 /* Blog image carousel */
@@ -584,6 +645,7 @@ body {
     overflow: hidden;
     background: #0b1220;
     border-radius: 8px;
+    z-index: 0;
 }
 
 .blog-image-track {
@@ -608,21 +670,28 @@ body {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
     background: rgba(0,0,0,0.45);
     color: white;
-    border: none;
-    padding: 6px 10px;
-    border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.25);
+    padding: 0;
+    border-radius: 50%;
     cursor: pointer;
     font-size: 16px;
+    line-height: 1;
 }
 
 .carousel-button:hover {
     background: rgba(0,0,0,0.65);
 }
 
-.carousel-prev { left: 8px; }
-.carousel-next { right: 8px; }
+.carousel-prev { left: 10px; }
+.carousel-next { right: 10px; }
 
 /* Hide buttons when only one slide (JS will add .single) */
 .blog-image-carousel.single .carousel-button { display: none; }

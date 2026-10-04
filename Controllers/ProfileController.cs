@@ -28,18 +28,21 @@ namespace Thinkfeed.Controllers
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return Challenge();
 
+            var userBlogs = await _profileService.GetUserBlogsAsync(user.Id);
+
             var model = new ProfileViewModel
             {
                 UserName = user.UserName,
                 FullName = user.FullName ?? string.Empty,
                 Bio = user.Bio,
-                ProfileImage = user.ProfileImage
+                ProfileImage = user.ProfileImage,
+                UserBlogs = userBlogs
             };
 
             ViewBag.BlogCount = await _profileService.GetBlogCountAsync(user.Id);
             ViewBag.FollowerCount = await _profileService.GetFollowerCountAsync(user.Id);
             ViewBag.FollowingCount = await _profileService.GetFollowingCountAsync(user.Id);
-            ViewBag.UserBlogs = await _profileService.GetUserBlogsAsync(user.Id);
+            ViewBag.UserBlogs = userBlogs;
 
             return View(model);
         }

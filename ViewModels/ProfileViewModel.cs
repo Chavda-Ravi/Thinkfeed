@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Http;
+using Thinkfeed.Models;
 
 namespace Thinkfeed.ViewModels
 {
@@ -15,6 +16,8 @@ namespace Thinkfeed.ViewModels
         public string? Bio { get; set; }
 
         public string? ProfileImage { get; set; }
+
+        public List<BlogPost> UserBlogs { get; set; } = new();
 
         public IFormFile? Image { get; set; }
     }

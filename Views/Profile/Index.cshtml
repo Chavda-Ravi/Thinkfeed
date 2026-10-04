@@ -87,14 +87,29 @@
 
         <h2>My Blogs</h2>
 
-        @if (ViewBag.UserBlogs != null &&
-             ViewBag.UserBlogs.Count > 0)
+        @if (Model.UserBlogs != null &&
+             Model.UserBlogs.Count > 0)
         {
-            @foreach (var blog in ViewBag.UserBlogs)
+            @foreach (var blog in Model.UserBlogs)
             {
                 <div class="blog-card">
 
-                    @if (!string.IsNullOrEmpty(blog.ImagePath))
+                    @if (blog.Images != null && blog.Images.Any())
+                    {
+                        <div class="blog-image-carousel" data-carousel-id="profile-@blog.BlogPostId">
+                            <button class="carousel-button carousel-prev" aria-label="Previous image" type="button">&lt;</button>
+                            <div class="blog-image-track">
+                                @foreach (var image in blog.Images)
+                                {
+                                    <div class="carousel-slide">
+                                        <img src="@image.ImagePath" class="blog-image" alt="Blog Image" />
+                                    </div>
+                                }
+                            </div>
+                            <button class="carousel-button carousel-next" aria-label="Next image" type="button">&gt;</button>
+                        </div>
+                    }
+                    else if (!string.IsNullOrEmpty(blog.ImagePath))
                     {
                         <img src="@blog.ImagePath"
                              class="blog-image"

@@ -15,4 +15,11 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="Thinkfeed.Tests\**\*.cs" />
+    <Content Remove="Thinkfeed.Tests\**\*" />
+    <EmbeddedResource Remove="Thinkfeed.Tests\**\*" />
+    <None Remove="Thinkfeed.Tests\**\*" />
+  </ItemGroup>
+
 </Project>

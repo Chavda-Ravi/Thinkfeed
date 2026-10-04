@@ -27,6 +27,7 @@ namespace Thinkfeed.Services
             var blogs = _context.BlogPosts
                 .Include(b => b.User)
                 .Include(b => b.Category)
+                .Include(b => b.Images)
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(query))
