@@ -102,6 +102,28 @@ namespace Thinkfeed.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RemoveProfileImage()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return Challenge();
+            }
+
+            try
+            {
+                await _profileService.DeleteProfileImageAsync(user.Id);
+            }
+            catch (InvalidOperationException)
+            {
+                return NotFound();
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
         [HttpGet]
         public async Task<IActionResult> ViewUser(string id)
         {

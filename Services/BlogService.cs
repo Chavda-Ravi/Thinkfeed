@@ -324,5 +324,77 @@ namespace Thinkfeed.Services
 
             await _blogRepository.SaveAsync();
         }
+
+        public async Task DeleteImageAsync(
+            int blogPostId,
+            int blogPostImageId,
+            string userId)
+        {
+            var blog = await _blogRepository.GetByIdAsync(blogPostId);
+
+            if (blog == null)
+            {
+                throw new InvalidOperationException("Blog not found.");
+            }
+
+            if (blog.UserId != userId)
+            {
+                throw new UnauthorizedAccessException();
+            }
+
+            var image = blog.Images
+                .FirstOrDefault(i => i.BlogPostImageId == blogPostImageId);
+
+            if (image == null)
+            {
+                throw new InvalidOperationException("Image not found.");
+            }
+
+            if (image.BlogPostId != blogPostId)
+            {
+                throw new InvalidOperationException("Image does not belong to this blog.");
+            }
+
+            var safePhysicalPath = GetSafePhysicalPath(image.ImagePath);
+            if (!string.IsNullOrEmpty(safePhysicalPath) && System.IO.File.Exists(safePhysicalPath))
+            {
+                System.IO.File.Delete(safePhysicalPath);
+            }
+
+            blog.Images.Remove(image);
+            _blogRepository.Update(blog);
+            await _blogRepository.SaveAsync();
+        }
+
+        private string? GetSafePhysicalPath(string? relativePath)
+        {
+            if (string.IsNullOrWhiteSpace(relativePath))
+            {
+                return null;
+            }
+
+            string normalized = relativePath.Trim();
+            normalized = normalized.Replace('\\', '/');
+
+            if (normalized.StartsWith("~/"))
+            {
+                normalized = normalized.Substring(2);
+            }
+
+            if (normalized.StartsWith("/"))
+            {
+                normalized = normalized.Substring(1);
+            }
+
+            string rootPath = Path.GetFullPath(_env.WebRootPath);
+            string candidatePath = Path.GetFullPath(Path.Combine(rootPath, normalized));
+
+            if (!candidatePath.StartsWith(rootPath, StringComparison.OrdinalIgnoreCase))
+            {
+                return null;
+            }
+
+            return candidatePath;
+        }
     }
 }

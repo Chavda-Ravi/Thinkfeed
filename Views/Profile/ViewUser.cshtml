@@ -18,7 +18,8 @@
 
         <div class="profile-image-container">
 
-            @if (!string.IsNullOrEmpty(Model.ProfileImage))
+            @if (!string.IsNullOrEmpty(Model.ProfileImage)
+                 && System.IO.File.Exists(System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "wwwroot", Model.ProfileImage.TrimStart('/'))))
             {
                 <img src="@Model.ProfileImage"
                      class="profile-image"
@@ -124,24 +125,48 @@
 
                     @if (blog.Images != null && blog.Images.Any())
                     {
-                        <div class="blog-image-carousel" data-carousel-id="profile-@blog.BlogPostId">
-                            <button class="carousel-button carousel-prev" aria-label="Previous image" type="button">&lt;</button>
-                            <div class="blog-image-track">
-                                @foreach (var image in blog.Images)
-                                {
-                                    <div class="carousel-slide">
-                                        <img src="@image.ImagePath" class="blog-image" alt="Blog Image" />
-                                    </div>
-                                }
+                        var validImages = blog.Images
+                            .Where(i => !string.IsNullOrWhiteSpace(i.ImagePath)
+                                && System.IO.File.Exists(System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "wwwroot", i.ImagePath.TrimStart('/'))))
+                            .ToList();
+
+                        if (validImages.Any())
+                        {
+                            <div class="blog-image-carousel" data-carousel-id="profile-@blog.BlogPostId">
+                                <button class="carousel-button carousel-prev" aria-label="Previous image" type="button">&lt;</button>
+                                <div class="blog-image-track">
+                                    @foreach (var image in validImages)
+                                    {
+                                        <div class="carousel-slide">
+                                            <img src="@image.ImagePath" class="blog-image" alt="Blog Image" />
+                                        </div>
+                                    }
+                                </div>
+                                <button class="carousel-button carousel-next" aria-label="Next image" type="button">&gt;</button>
                             </div>
-                            <button class="carousel-button carousel-next" aria-label="Next image" type="button">&gt;</button>
-                        </div>
+                        }
+                        else if (!string.IsNullOrEmpty(blog.ImagePath) &&
+                                 System.IO.File.Exists(System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "wwwroot", blog.ImagePath.TrimStart('/'))))
+                        {
+                            <img src="@blog.ImagePath" class="blog-image" alt="Blog Image" />
+                        }
+                        else
+                        {
+                            <div class="image-fallback">
+                                <span>Image unavailable</span>
+                            </div>
+                        }
                     }
-                    else if (!string.IsNullOrEmpty(blog.ImagePath))
+                    else if (!string.IsNullOrEmpty(blog.ImagePath) &&
+                             System.IO.File.Exists(System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "wwwroot", blog.ImagePath.TrimStart('/'))))
                     {
-                        <img src="@blog.ImagePath"
-                             class="blog-image"
-                             alt="Blog Image" />
+                        <img src="@blog.ImagePath" class="blog-image" alt="Blog Image" />
+                    }
+                    else
+                    {
+                        <div class="image-fallback">
+                            <span>Image unavailable</span>
+                        </div>
                     }
 
                     <div class="blog-content">

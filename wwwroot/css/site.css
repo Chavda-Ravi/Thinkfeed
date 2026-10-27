@@ -639,6 +639,29 @@ select.form-control {
     }
 }
 
+.image-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 260px;
+    background: linear-gradient(135deg, #f0ebff 0%, #eef2ff 100%);
+    border: 1px dashed rgba(91, 74, 228, 0.35);
+    color: var(--primary-strong);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+}
+
+    .image-fallback.compact {
+        min-height: 180px;
+    }
+
+    .image-fallback.large {
+        min-height: 340px;
+    }
+
 /* Blog image carousel */
 .blog-image-carousel {
     position: relative;

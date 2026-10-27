@@ -14,6 +14,14 @@
             Update your Thinkfeed profile
         </p>
 
+        @{
+            string profileInitial = !string.IsNullOrWhiteSpace(Model.FullName)
+                ? Model.FullName.Trim()[0].ToString().ToUpper()
+                : (!string.IsNullOrWhiteSpace(Model.UserName)
+                    ? Model.UserName.Trim()[0].ToString().ToUpper()
+                    : "U");
+        }
+
         <form asp-controller="Profile"
               asp-action="Edit"
               method="post"
@@ -36,7 +44,7 @@
                 else
                 {
                     <div class="profile-edit-placeholder">
-                        @Model.FullName.Substring(0, 1).ToUpper()
+                        @profileInitial
                     </div>
                 }
 

@@ -128,14 +128,19 @@ namespace Thinkfeed.Controllers
                 await _blogService.GetCategoriesAsync();
 
             // Provide existing images (use Images collection if present; otherwise fallback to old ImagePath)
-            var existing = new List<string>();
+            var existing = new List<BlogPostImage>();
             if (blog.Images != null && blog.Images.Any())
             {
-                existing.AddRange(blog.Images.Where(i => !string.IsNullOrEmpty(i.ImagePath)).Select(i => i.ImagePath));
+                existing.AddRange(blog.Images.Where(i => !string.IsNullOrEmpty(i.ImagePath)));
             }
             else if (!string.IsNullOrEmpty(blog.ImagePath))
             {
-                existing.Add(blog.ImagePath);
+                existing.Add(new BlogPostImage
+                {
+                    BlogPostId = blog.BlogPostId,
+                    ImagePath = blog.ImagePath,
+                    BlogPostImageId = 0
+                });
             }
             ViewBag.ExistingImages = existing;
 
@@ -192,6 +197,40 @@ namespace Thinkfeed.Controllers
             return RedirectToAction(
                 "Details",
                 new { id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteImage(
+            int blogPostId,
+            int blogPostImageId)
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user == null)
+            {
+                return Challenge();
+            }
+
+            try
+            {
+                await _blogService.DeleteImageAsync(
+                    blogPostId,
+                    blogPostImageId,
+                    user.Id);
+            }
+            catch (InvalidOperationException)
+            {
+                return NotFound();
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Forbid();
+            }
+
+            return RedirectToAction(
+                nameof(Edit),
+                new { id = blogPostId });
         }
 
         [HttpGet]

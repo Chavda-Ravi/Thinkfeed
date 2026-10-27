@@ -11,25 +11,48 @@
         @* Multiple Blog Images *@
         @if (Model.Images != null && Model.Images.Any())
         {
-            <div class="blog-image-carousel" data-carousel-id="details-@Model.BlogPostId">
-                <button class="carousel-button carousel-prev" aria-label="Previous image" type="button">&lt;</button>
-                <div class="blog-image-track">
-                    @foreach (var image in Model.Images)
-                    {
-                        <div class="carousel-slide">
-                            <img src="@image.ImagePath" class="blog-image" alt="Blog Image" />
-                        </div>
-                    }
+            var validImages = Model.Images
+                .Where(i => !string.IsNullOrWhiteSpace(i.ImagePath)
+                    && System.IO.File.Exists(System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "wwwroot", i.ImagePath.TrimStart('/'))))
+                .ToList();
+
+            if (validImages.Any())
+            {
+                <div class="blog-image-carousel" data-carousel-id="details-@Model.BlogPostId">
+                    <button class="carousel-button carousel-prev" aria-label="Previous image" type="button">&lt;</button>
+                    <div class="blog-image-track">
+                        @foreach (var image in validImages)
+                        {
+                            <div class="carousel-slide">
+                                <img src="@image.ImagePath" class="blog-image" alt="Blog Image" />
+                            </div>
+                        }
+                    </div>
+                    <button class="carousel-button carousel-next" aria-label="Next image" type="button">&gt;</button>
                 </div>
-                <button class="carousel-button carousel-next" aria-label="Next image" type="button">&gt;</button>
-            </div>
+            }
+            else if (!string.IsNullOrEmpty(Model.ImagePath) &&
+                     System.IO.File.Exists(System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "wwwroot", Model.ImagePath.TrimStart('/'))))
+            {
+                <img src="@Model.ImagePath" class="blog-image" alt="Blog Image" />
+            }
+            else
+            {
+                <div class="image-fallback large">
+                    <span>Image unavailable</span>
+                </div>
+            }
         }
-        else if (!string.IsNullOrEmpty(Model.ImagePath))
+        else if (!string.IsNullOrEmpty(Model.ImagePath) &&
+                 System.IO.File.Exists(System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "wwwroot", Model.ImagePath.TrimStart('/'))))
         {
-            @* Old single-image support *@
-            <img src="@Model.ImagePath"
-                 class="blog-image"
-                 alt="Blog Image" />
+            <img src="@Model.ImagePath" class="blog-image" alt="Blog Image" />
+        }
+        else
+        {
+            <div class="image-fallback large">
+                <span>Image unavailable</span>
+            </div>
         }
 
         <div class="blog-details-content">

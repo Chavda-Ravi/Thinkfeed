@@ -29,6 +29,11 @@ namespace Thinkfeed.Services
             await _commentRepository.SaveAsync();
         }
 
+        public async Task<Comment?> GetByIdAsync(int commentId)
+        {
+            return await _commentRepository.GetByIdAsync(commentId);
+        }
+
         public async Task EditAsync(int commentId, string userId, string content)
         {
             var comment = await _commentRepository.GetByIdAsync(commentId);

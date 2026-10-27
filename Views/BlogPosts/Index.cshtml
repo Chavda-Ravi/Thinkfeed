@@ -40,17 +40,49 @@
                     <div class="blog-image-track">
                         @if (blog.Images != null && blog.Images.Any())
                         {
-                            @foreach (var img in blog.Images)
+                            var validImages = blog.Images
+                                .Where(i => !string.IsNullOrWhiteSpace(i.ImagePath)
+                                    && System.IO.File.Exists(System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "wwwroot", i.ImagePath.TrimStart('/'))))
+                                .ToList();
+
+                            if (validImages.Any())
+                            {
+                                @foreach (var img in validImages)
+                                {
+                                    <div class="carousel-slide">
+                                        <img src="@img.ImagePath" class="blog-image" alt="Blog Image" />
+                                    </div>
+                                }
+                            }
+                            else if (!string.IsNullOrEmpty(blog.ImagePath) &&
+                                     System.IO.File.Exists(System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "wwwroot", blog.ImagePath.TrimStart('/'))))
                             {
                                 <div class="carousel-slide">
-                                    <img src="@img.ImagePath" class="blog-image" alt="Blog Image" />
+                                    <img src="@blog.ImagePath" class="blog-image" alt="Blog Image" />
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="carousel-slide">
+                                    <div class="image-fallback compact">
+                                        <span>Image unavailable</span>
+                                    </div>
                                 </div>
                             }
                         }
-                        else if (!string.IsNullOrEmpty(blog.ImagePath))
+                        else if (!string.IsNullOrEmpty(blog.ImagePath) &&
+                                 System.IO.File.Exists(System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "wwwroot", blog.ImagePath.TrimStart('/'))))
                         {
                             <div class="carousel-slide">
                                 <img src="@blog.ImagePath" class="blog-image" alt="Blog Image" />
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="carousel-slide">
+                                <div class="image-fallback compact">
+                                    <span>Image unavailable</span>
+                                </div>
                             </div>
                         }
                     </div>

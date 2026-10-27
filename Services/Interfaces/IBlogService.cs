@@ -35,5 +35,10 @@ namespace Thinkfeed.Services.Interfaces
         Task DeleteAsync(
             int id,
             string userId);
+
+        Task DeleteImageAsync(
+            int blogPostId,
+            int blogPostImageId,
+            string userId);
     }
 }

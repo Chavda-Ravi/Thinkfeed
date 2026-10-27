@@ -11,5 +11,6 @@ namespace Thinkfeed.Services.Interfaces
         Task<int> GetFollowerCountAsync(string userId);
         Task<int> GetFollowingCountAsync(string userId);
         Task<bool> IsFollowingAsync(string currentUserId, string targetUserId);
+        Task DeleteProfileImageAsync(string userId);
     }
 }

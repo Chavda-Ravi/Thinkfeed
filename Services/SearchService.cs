@@ -42,7 +42,11 @@ namespace Thinkfeed.Services
 
             if (!string.IsNullOrWhiteSpace(username))
             {
-                blogs = blogs.Where(b => b.User != null && (b.User.UserName!.Contains(username) || b.User.FullName!.Contains(username)));
+                blogs = blogs.Where(b =>
+                    b.User != null && (
+                        (b.User.UserName != null && b.User.UserName.Contains(username)) ||
+                        (b.User.FullName != null && b.User.FullName.Contains(username))
+                    ));
             }
 
             return await blogs.OrderByDescending(b => b.CreatedAt).ToListAsync();

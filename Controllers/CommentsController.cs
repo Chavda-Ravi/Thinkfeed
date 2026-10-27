@@ -44,10 +44,17 @@ namespace Thinkfeed.Controllers
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return Challenge();
 
+            var comment = await _commentService.GetByIdAsync(id);
+            if (comment == null) return NotFound();
+
+            if (string.IsNullOrWhiteSpace(content))
+            {
+                return RedirectToAction("Details", "BlogPosts", new { id = comment.BlogPostId });
+            }
+
             await _commentService.EditAsync(id, user.Id, content);
 
-            // redirect to blog details - determine blogId from repository would be extra; keep previous behavior by redirecting back to referrer if available
-            return Redirect(Request.Headers["Referer"].ToString());
+            return RedirectToAction("Details", "BlogPosts", new { id = comment.BlogPostId });
         }
 
         [HttpPost]
@@ -57,9 +64,12 @@ namespace Thinkfeed.Controllers
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return Challenge();
 
+            var comment = await _commentService.GetByIdAsync(id);
+            if (comment == null) return NotFound();
+
             await _commentService.DeleteAsync(id, user.Id);
 
-            return Redirect(Request.Headers["Referer"].ToString());
+            return RedirectToAction("Details", "BlogPosts", new { id = comment.BlogPostId });
         }
     }
 }

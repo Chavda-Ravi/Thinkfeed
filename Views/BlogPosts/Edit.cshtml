@@ -96,15 +96,32 @@
                 <label>Existing Images</label>
 
                 <div style="margin-bottom:10px;">
-                    @if (ViewBag.ExistingImages != null && ((List<string>)ViewBag.ExistingImages).Any())
+                    @if (ViewBag.ExistingImages != null && ((IEnumerable<Thinkfeed.Models.BlogPostImage>)ViewBag.ExistingImages).Any())
                     {
                         <div class="blog-image-carousel" data-carousel-id="edit-@(Context.Request.RouteValues["id"])">
                             <button class="carousel-button carousel-prev" aria-label="Previous image" type="button">&lt;</button>
                             <div class="blog-image-track">
-                                @foreach (var img in (List<string>)ViewBag.ExistingImages)
+                                @foreach (var img in (IEnumerable<Thinkfeed.Models.BlogPostImage>)ViewBag.ExistingImages)
                                 {
                                     <div class="carousel-slide">
-                                        <img src="@img" class="blog-image" alt="Blog Image" />
+                                        <img src="@img.ImagePath" class="blog-image" alt="Blog Image" />
+
+                                        @if (img.BlogPostImageId > 0)
+                                        {
+                                            <form asp-controller="BlogPosts"
+                                                  asp-action="DeleteImage"
+                                                  method="post"
+                                                  style="margin-top: 10px;">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="blogPostId" value="@Context.Request.RouteValues["id"]" />
+                                                <input type="hidden" name="blogPostImageId" value="@img.BlogPostImageId" />
+                                                <button type="submit"
+                                                        class="secondary-button"
+                                                        onclick="return confirm('Are you sure you want to delete this image?');">
+                                                    Delete
+                                                </button>
+                                            </form>
+                                        }
                                     </div>
                                 }
                             </div>
