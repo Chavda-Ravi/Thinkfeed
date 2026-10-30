@@ -290,6 +290,34 @@ namespace Thinkfeed.Migrations
                     b.ToTable("BlogPostImages");
                 });
 
+            modelBuilder.Entity("Thinkfeed.Models.Bookmark", b =>
+                {
+                    b.Property<int>("BookmarkId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BookmarkId"));
+
+                    b.Property<int>("BlogPostId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("BookmarkId");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("BlogPostId", "UserId")
+                        .IsUnique();
+
+                    b.ToTable("Bookmarks");
+                });
+
             modelBuilder.Entity("Thinkfeed.Models.Category", b =>
                 {
                     b.Property<int>("CategoryId")
@@ -519,6 +547,25 @@ namespace Thinkfeed.Migrations
                     b.Navigation("BlogPost");
                 });
 
+            modelBuilder.Entity("Thinkfeed.Models.Bookmark", b =>
+                {
+                    b.HasOne("Thinkfeed.Models.BlogPost", "BlogPost")
+                        .WithMany("Bookmarks")
+                        .HasForeignKey("BlogPostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Thinkfeed.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("BlogPost");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Thinkfeed.Models.Comment", b =>
                 {
                     b.HasOne("Thinkfeed.Models.BlogPost", "BlogPost")
@@ -591,6 +638,8 @@ namespace Thinkfeed.Migrations
 
             modelBuilder.Entity("Thinkfeed.Models.BlogPost", b =>
                 {
+                    b.Navigation("Bookmarks");
+
                     b.Navigation("Comments");
 
                     b.Navigation("Images");

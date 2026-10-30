@@ -30,6 +30,9 @@ namespace Thinkfeed.Models
         public ICollection<Like> Likes { get; set; }
             = new List<Like>();
 
+        public ICollection<Bookmark> Bookmarks { get; set; }
+            = new List<Bookmark>();
+
         
         public ICollection<BlogPostImage> Images { get; set; }
             = new List<BlogPostImage>();

@@ -144,6 +144,31 @@
                         }
 
                     </form>
+
+                    <form asp-controller="Bookmarks"
+                          asp-action="Toggle"
+                          method="post">
+
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden"
+                               name="blogPostId"
+                               value="@Model.BlogPostId" />
+
+                        @if (ViewBag.IsBookmarked == true)
+                        {
+                            <button type="submit">
+                                ★ Remove Bookmark
+                            </button>
+                        }
+                        else
+                        {
+                            <button type="submit">
+                                ☆ Bookmark
+                            </button>
+                        }
+
+                    </form>
                 }
                 else
                 {
@@ -151,6 +176,12 @@
                        asp-action="Login"
                        class="read-button">
                         Login to Like
+                    </a>
+
+                    <a asp-controller="Account"
+                       asp-action="Login"
+                       class="read-button">
+                        Login to Bookmark
                     </a>
                 }
 

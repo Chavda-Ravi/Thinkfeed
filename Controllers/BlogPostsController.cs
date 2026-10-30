@@ -11,13 +11,16 @@ namespace Thinkfeed.Controllers
     public class BlogPostsController : Controller
     {
         private readonly IBlogService _blogService;
+        private readonly IBookmarkService _bookmarkService;
         private readonly UserManager<ApplicationUser> _userManager;
 
         public BlogPostsController(
             IBlogService blogService,
+            IBookmarkService bookmarkService,
             UserManager<ApplicationUser> userManager)
         {
             _blogService = blogService;
+            _bookmarkService = bookmarkService;
             _userManager = userManager;
         }
 
@@ -98,6 +101,9 @@ namespace Thinkfeed.Controllers
             }
 
             ViewBag.IsLiked = result.isLiked;
+
+            ViewBag.IsBookmarked = currentUserId != null
+                && await _bookmarkService.IsBookmarkedAsync(id, currentUserId);
 
             return View(result.blog);
         }

@@ -18,6 +18,7 @@ namespace Thinkfeed.Data
         public DbSet<Like> Likes { get; set; }
         public DbSet<Follow> Follows { get; set; }
         public DbSet<Category> Categories { get; set; }
+        public DbSet<Bookmark> Bookmarks { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -79,6 +80,22 @@ namespace Thinkfeed.Data
 
             builder.Entity<Like>()
                 .HasIndex(l => new { l.BlogPostId, l.UserId })
+                .IsUnique();
+
+            builder.Entity<Bookmark>()
+                .HasOne(b => b.BlogPost)
+                .WithMany(p => p.Bookmarks)
+                .HasForeignKey(b => b.BlogPostId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<Bookmark>()
+                .HasOne(b => b.User)
+                .WithMany()
+                .HasForeignKey(b => b.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Bookmark>()
+                .HasIndex(b => new { b.BlogPostId, b.UserId })
                 .IsUnique();
 
             builder.Entity<Follow>()
