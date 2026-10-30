@@ -17,7 +17,7 @@ namespace Thinkfeed.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.12")
+                .HasAnnotation("ProductVersion", "10.0.14")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -306,6 +306,48 @@ namespace Thinkfeed.Migrations
                     b.HasKey("CategoryId");
 
                     b.ToTable("Categories");
+
+                    b.HasData(
+                        new
+                        {
+                            CategoryId = 1,
+                            Name = "Technology"
+                        },
+                        new
+                        {
+                            CategoryId = 2,
+                            Name = "Programming"
+                        },
+                        new
+                        {
+                            CategoryId = 3,
+                            Name = "Education"
+                        },
+                        new
+                        {
+                            CategoryId = 4,
+                            Name = "Travel"
+                        },
+                        new
+                        {
+                            CategoryId = 5,
+                            Name = "Lifestyle"
+                        },
+                        new
+                        {
+                            CategoryId = 6,
+                            Name = "Business"
+                        },
+                        new
+                        {
+                            CategoryId = 7,
+                            Name = "Health"
+                        },
+                        new
+                        {
+                            CategoryId = 8,
+                            Name = "Entertainment"
+                        });
                 });
 
             modelBuilder.Entity("Thinkfeed.Models.Comment", b =>

@@ -84,6 +84,16 @@ namespace Thinkfeed.Data
             builder.Entity<Follow>()
                 .HasIndex(f => new { f.FollowerId, f.FollowingId })
                 .IsUnique();
+
+            builder.Entity<Category>().HasData(
+                new Category { CategoryId = 1, Name = "Technology" },
+                new Category { CategoryId = 2, Name = "Programming" },
+                new Category { CategoryId = 3, Name = "Education" },
+                new Category { CategoryId = 4, Name = "Travel" },
+                new Category { CategoryId = 5, Name = "Lifestyle" },
+                new Category { CategoryId = 6, Name = "Business" },
+                new Category { CategoryId = 7, Name = "Health" },
+                new Category { CategoryId = 8, Name = "Entertainment" });
         }
     }
 }
